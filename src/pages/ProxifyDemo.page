@@ -1,0 +1,60 @@
+<apex:page >
+
+<body>
+<h1>Proxify</h1>
+
+<p>
+Proxify is a tool for proxying javascript and css content from CDNs that do not support SSL (such as code.jquery.com) to ensure it is received by your app via SSL.</p>
+
+<p>Proxify consists of three elements:</p>
+<ol>
+	<li>The Proxify component (Proxify.component), which helps make creating Proxify links easier. It also handles the rendering of a &lt;link /&gt; vs. &lt;script /&gt; vs. tag for an asset, based on the content type.</li>
+	<li>The Proxify Visualforce page (Proxify.page), which serves as the proxy endpoint for all Proxify calls.</li>
+	<li>The Proxify Apex class (Proxify.cls), which drives functionality for both Proxify.component and Proxify.page</li>
+</ol>
+
+<p>The architecture of Proxify is as follows:</p>
+<ol>
+	<li>An instance of the Proxify component takes four parameters:
+		<ol>
+			<li>url - the url of the external asset to include. This can be a relative internal URL or (most commonly) a fully-qualified external URL.<br />
+			Note: in order to use Proxify, you do need to add the root of the site referenced in url to the "Remote Site Settings" list in Salesforce.com (a future release may address this).</li>
+			<li>contentType - the mime type (ex 'text/css') of the asset referenced by "url". This is not required, and Proxify will attempt to infer the mime type from the url.
+			However, if you run into issues, include a contentType.</li>
+			<li>cache (optional) - similar to a VF page's cache attribute, this indicates if the asset referenced should be cached. Default is false. 
+			Caching is highly encouraged for non-volatile assets like javascript libraries.</li>
+			<li>expires - similar to a VF page's expires attribute, this indicates the duration (in seconds) which the asset referenced should be cached. Default is 0. A value should be specified if cache=true.</li>
+		</ol>
+		
+		<p>
+			<pre>
+&lt;c:Proxify url="http://www.website.com/asset.css" contentType="text/css" cache="true" expires="600" /&gt;
+			</pre>
+		</p>
+		
+	</li>
+	<li>Under the hood, an instance of Proxify.component constructs a reference to the Proxify.page proxy page.</li>
+	<li>Proxify.page's controller, Proxify.cls, executes an HTTP request to the url requested and returns the body of the response.</li>
+	<li>Each request to Proxify.page per component is unique, consuming only one callout against the governor limit of 10. These calls are not cumulative, so there's no risk to the hitting the limits.</li>
+</ol>
+
+<p>
+
+</p>
+
+<p>This page includes examples of Proxify usage. 
+View this page in raw form to see the examples, and view the source of the rendered page to see the execution.  
+In this case, we are using Proxify to load js and css files for jQuery and jQuery Mobile. 
+For demonstration, two of the Proxify components are configured to cache for 10 minutes (600 seconds). 
+</p>
+
+<div>
+	<c:Proxify contentType="text/css" url="http://code.jquery.com/mobile/latest/jquery.mobile.min.css" />
+   	<c:Proxify cache="true" expires="600" contentType="text/javascript" url="http://code.jquery.com/jquery.min.js" />
+   	<c:Proxify cache="true" expires="600" contentType="text/javascript" url="http://code.jquery.com/ui/1.8.16/jquery-ui.min.js" />
+   	<c:Proxify contentType="text/javascript" url="http://code.jquery.com/mobile/latest/jquery.mobile.min.js" />
+</div>
+
+</body>
+
+</apex:page>

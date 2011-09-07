@@ -1,0 +1,10 @@
+<apex:component controller="Proxify">
+	<apex:attribute name="url" assignTo="{!v_url}" type="String" description="URL of the resource you want to reference." />
+	<apex:attribute name="contentType" assignTo="{!v_contentType}" type="String" description="MIME type of resource being referenced. This will be gleaned from the URL unless it is not recognized as a standard type." />
+	<apex:attribute name="expires" type="Integer" assignTo="{!v_expires}" description="" />  
+	<apex:attribute name="cache" type="Boolean" assignTo="{!v_cache}" description="" />
+	
+	<apex:outputPanel layout="none" rendered="{!v_contentType == 'text/css'}"><apex:stylesheet value="{!link}" /></apex:outputPanel>
+	<apex:outputPanel layout="none" rendered="{!v_contentType == 'text/javascript'}"><apex:includeScript value="{!link}" /></apex:outputPanel>  	
+	
+</apex:component>
